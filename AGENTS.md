@@ -45,6 +45,10 @@
    改名 / 迁移 / 替换目录时，顺序铁定为 **复制 → 验证新副本可用（能编译、能 git status）→ 才删除旧的**。
    永远不要因为「反正有另一份」就先跑 `Remove-Item -Recurse`——
    `-Recurse` 是先删子项再删根目录，根目录锁住时你会收到「删除失败」，但内容已经没了。
+8. **`.ps1` 必须存为 UTF-8 **带 BOM**，换行 CRLF**（2026-11-06 踩坑）：
+   Windows PowerShell 5.1 默认按 ANSI 读脚本，中文会变成乱码并抛
+   `TerminatorExpectedAtEndOfString` 之类的语法错——看起来像脚本写错了，其实是编码。
+   另外 PS 5.1 读取 4xx/5xx 响应体要走 `$_.ErrorDetails.Message`，读响应流常常是空的。
 
 ---
 
