@@ -37,23 +37,43 @@
 ## 怎么验证一次迁移
 
 ```powershell
-# 建库（首次）
-#   1. 用 root 建库和账号
-#   2. 用 hearth 账号执行迁移
+# 方式一：让应用启动时自动执行（推荐，和线上一致）
+mvn -f backend\pom.xml package -DskipTests
+java -jar backend\target\hearth.jar        # 需要 DB_* 环境变量
+
+# 方式二：手工执行（排障用）
 mysql -u hearth -p hearth < db/migrations/V001__platform_init.sql
-mysql -u hearth -p hearth < db/migrations/V002__followup_init.sql
 
 # 核对
+mysql -u hearth -p hearth -e "SELECT version, description, success FROM flyway_schema_history ORDER BY installed_rank;"
 mysql -u hearth -p hearth -e "SHOW FULL TABLES;"
-mysql -u hearth -p hearth -e "SELECT code,name FROM app_shop; SELECT code,name FROM app_role;"
 ```
 
-Flyway 接入后（P0.5），改为：
+---
 
-```powershell
-mvn -f backend\pom.xml flyway:migrate
-mysql -u hearth -p hearth -e "SELECT version, description, success FROM flyway_schema_history;"
+## 文件位置与打包方式（别改错了）
+
+**真相在 `db/migrations/`**（人读方便、有 README、git 历史清晰）。
+
+构建时由 `backend/pom.xml` 的 `<resources>` 复制进 jar 的 `db/migration/`：
+
+```xml
+<resource>
+  <directory>${project.basedir}/../db/migrations</directory>
+  <targetPath>db/migration</targetPath>
+  <includes><include>**/*.sql</include></includes>
+</resource>
 ```
 
-> 注意：Flyway 接入后，上面两个文件需要移到 `backend/src/main/resources/db/migration/`，
-> 或通过配置指向 `db/migrations/`。迁移这一步在 P0.5 一次做完。
+Flyway 读的是 `classpath:db/migration`，所以**不要**把 SQL 手动挪进 `backend/src/main/resources/`——
+那样会出现两份，改了一份另一份不动。
+
+---
+
+## 已经踩过的坑
+
+| 现象 | 原因 | 处置 |
+| --- | --- | --- |
+| `Found non-empty schema "hearth" without schema history table` | 表是手工建的，Flyway 不认 | 已配 `baseline-on-migrate: true` + `baseline-version: 0` |
+| 日志里一堆 `Table 'xxx' already exists` | 同上：V001/V002 用 `CREATE TABLE IF NOT EXISTS` 重跑 | 无害，警告而已 |
+| `MySQL 8.4 is newer than this version of Flyway` | Spring Boot 3.3.5 带的 Flyway 10.10 最高支持 MySQL 8.1 | 目前功能正常，等升级 Flyway 再消
