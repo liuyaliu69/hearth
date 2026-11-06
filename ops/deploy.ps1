@@ -180,7 +180,14 @@ try {
     $dirty = $null
     try { $dirty = & git status --porcelain } catch { $dirty = $null }
 
-    if ($dirty -and -not $Force) {
+    # 发布过程自己会写 ops/releases/ 和 CHANGELOG.md，这两处不算"工作区脏"
+    if ($dirty) {
+        $dirty = @($dirty | Where-Object {
+                ($_ -notmatch 'ops/releases/') -and ($_ -notmatch 'CHANGELOG\.md')
+            })
+    }
+
+    if ($dirty -and $dirty.Count -gt 0 -and -not $Force) {
         Pop-Location
         Say "工作区有未提交改动：" DarkGray
         $dirty | ForEach-Object { Say "  $_" DarkGray }
@@ -204,6 +211,24 @@ try {
 }
 
 # ---------------------------------------------------------------- 2 构建
+# 本地开发实例会占住 target\hearth.jar，导致 mvn clean 删不掉。
+# 发布时不该有实例持有即将被替换的产物，这里自动停掉并告知。
+$holders = @()
+try {
+    $holders = @(Get-CimInstance Win32_Process -Filter "Name='java.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -like "*hearth.jar*" })
+} catch { $holders = @() }
+
+if ($holders.Count -gt 0 -and -not $DryRun) {
+    Say ""
+    Say "  检测到 $($holders.Count) 个本地实例占用 hearth.jar，先停止（发布期间不该占用）" Yellow
+    foreach ($h in $holders) {
+        try { Stop-Process -Id $h.ProcessId -Force -ErrorAction Stop; Say "    已停止 pid=$($h.ProcessId)" Gray } catch { }
+    }
+    Start-Sleep -Seconds 2
+    [void]$script:reportLines.Add("  - 停止了 $($holders.Count) 个占用 jar 的本地实例")
+}
+
 if ($SkipBuild) {
     Step '2 构建' '已跳过（-SkipBuild）'
     if (-not (Test-Path $jar)) { Fail "没有可用的 jar：$jar" }
