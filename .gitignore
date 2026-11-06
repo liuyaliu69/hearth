@@ -1,0 +1,33 @@
+# 后端
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.idea/
+*.iml
+
+# 小程序
+node_modules/
+miniprogram_npm/
+
+# 本地配置与密钥
+*.local.yml
+application-local.yml
+.env
+.env.*
+
+# 数据快照（含真实手机号，绝不入库）
+data/
+*.csv
+
+# 日志
+logs/
+*.log
+
+# 本地 nginx 运行时
+ops/nginx/logs/
+ops/nginx/temp/
+
+# 系统
+.DS_Store
+Thumbs.db
