@@ -1,0 +1,18 @@
+{
+  "description": "Hearth 火花私域",
+  "appid": "wx08f3b9fd18bf9215",
+  "projectname": "hearth",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "./",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false
+  },
+  "condition": {}
+}

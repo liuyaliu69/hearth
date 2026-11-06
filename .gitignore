@@ -9,6 +9,7 @@ target/
 # 小程序
 node_modules/
 miniprogram_npm/
+miniprogram/project.private.config.json
 
 # 本地配置与密钥
 *.local.yml

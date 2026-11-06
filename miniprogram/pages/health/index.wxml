@@ -1,0 +1,66 @@
+<view class="container">
+
+  <view class="card">
+    <view class="card-title">环境</view>
+    <view class="row">
+      <text class="label">ENV</text>
+      <text class="value">{{env}}</text>
+    </view>
+    <view class="row">
+      <text class="label">BASE_URL</text>
+      <text class="value">{{baseUrl}}</text>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{loading}}">
+    <view class="card-title">正在请求 /api/health …</view>
+  </view>
+
+  <view class="card" wx:elif="{{error}}">
+    <view class="card-title down">请求失败</view>
+    <view class="code">{{error}}
+
+可能原因：
+1. 后端没启动（java -jar backend\\target\\hearth.jar）
+2. 真机用了 127.0.0.1（应改成电脑局域网 IP）
+3. 防火墙拦了 8080
+4. 开发者工具没勾「不校验合法域名」</view>
+  </view>
+
+  <block wx:else>
+    <view class="card">
+      <view class="card-title">
+        后端 <text class="{{health.ok ? 'ok' : 'down'}}">{{health.ok ? '正常' : '异常'}}</text>
+      </view>
+      <view class="row">
+        <text class="label">app</text>
+        <text class="value">{{health.app}}</text>
+      </view>
+      <view class="row">
+        <text class="label">服务器时间</text>
+        <text class="value">{{health.time}}</text>
+      </view>
+      <view class="row">
+        <text class="label">数据库</text>
+        <text class="value {{health.db.status === 'ok' ? 'ok' : 'down'}}">{{health.db.status}}</text>
+      </view>
+      <view class="row">
+        <text class="label">MySQL</text>
+        <text class="value">{{health.db.version}}</text>
+      </view>
+      <view class="row">
+        <text class="label">库名</text>
+        <text class="value">{{health.db.catalog}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">原始响应</view>
+      <view class="code">{{raw}}</view>
+    </view>
+  </block>
+
+  <view class="btn" bindtap="onReload">重新请求</view>
+  <view class="btn btn-ghost" bindtap="onCopyRaw" wx:if="{{raw}}">复制响应</view>
+
+</view>
