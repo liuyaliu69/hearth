@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     本地启动后端：从仓库外的 _local\hearth-db.env 读数据库凭据，注入环境变量后跑 Spring Boot。

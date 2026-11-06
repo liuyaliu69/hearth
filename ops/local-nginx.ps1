@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     本地 nginx 控制：用仓库内配置跑你的 nginx.exe，不改动安装目录。
