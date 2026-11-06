@@ -41,7 +41,7 @@
 
 | 目录 | 放什么 |
 | --- | --- |
-| `platform/docs/` | 跨周期约定：定位、技术、命名、发布、术语、部署 |
+| `platform/docs/` | 跨周期约定：定位、技术、命名、发布、术语、部署、小程序操作 |
 | `platform/decisions/` | ADR：每个「为什么这么定」 |
 | `backend/` | 唯一的 Spring Boot 应用（多模块共存） |
 | `miniprogram/` | 唯一的小程序 |
