@@ -1,5 +1,6 @@
 package cn.firedance.hearth;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * </ul>
  */
 @SpringBootApplication
-@MapperScan("cn.firedance.hearth.**.mapper")
+// 扫全包，但只认 @Mapper 注解的接口 —— 这样 Mapper 不必强制放在 **/mapper 目录下
+@MapperScan(basePackages = "cn.firedance.hearth", annotationClass = Mapper.class)
 public class HearthApplication {
 
     public static void main(String[] args) {

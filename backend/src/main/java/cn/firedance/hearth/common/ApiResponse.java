@@ -18,4 +18,9 @@ public record ApiResponse<T>(int code, String msg, T data) {
     public static <T> ApiResponse<T> fail(int code, String msg) {
         return new ApiResponse<>(code, msg, null);
     }
+
+    /** 失败但需要带数据（例如未开通时要把 openid 回给前端展示） */
+    public static <T> ApiResponse<T> fail(int code, String msg, T data) {
+        return new ApiResponse<>(code, msg, data);
+    }
 }
