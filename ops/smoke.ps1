@@ -106,8 +106,13 @@ $login = Invoke-Api "$BaseUrl/api/auth/login" 'POST' $loginReq
 $lbody = $null
 try { $lbody = $login.Body | ConvertFrom-Json } catch { }
 
-$ok4 = ($null -ne $lbody) -and (($lbody.code -eq 403) -or ($lbody.code -eq 401))
-$mode = if ($ok4 -and $lbody.code -eq 403) { 'mock' } elseif ($ok4) { 'real' } else { '?' }
+$ok4 = ($null -ne $lbody) -and (($lbody.code -eq 403) -or ($lbody.code -eq 401) -or ($lbody.code -eq 503))
+$mode = '?'
+if ($ok4) {
+    if ($lbody.code -eq 403) { $mode = 'mock' }
+    elseif ($lbody.code -eq 401) { $mode = 'real' }
+    else { $mode = '已禁用(未配凭据)' }
+}
 Add-Result '登录接口可达且返回统一 JSON' $ok4 "HTTP=$($login.Status) 模式=$mode"
 
 # ---- 汇总 ----
