@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.firedance.hearth.auth.admin.AdminMapper">
+
+    <sql id="userRowColumns">
+        u.id            AS id,
+        u.name          AS name,
+        u.openid        AS openid,
+        u.staff_id      AS staffId,
+        s.name          AS staffName,
+        s.mobile        AS staffMobile,
+        u.status        AS status,
+        u.last_login_at AS lastLoginAt
+    </sql>
+
+    <select id="findAllUsers" resultType="cn.firedance.hearth.auth.admin.AdminUserRow">
+        SELECT
+        <include refid="userRowColumns"/>
+        FROM app_user u
+        LEFT JOIN app_staff s ON s.id = u.staff_id
+        ORDER BY u.id
+    </select>
+
+    <select id="findUserById" resultType="cn.firedance.hearth.auth.admin.AdminUserRow">
+        SELECT
+        <include refid="userRowColumns"/>
+        FROM app_user u
+        LEFT JOIN app_staff s ON s.id = u.staff_id
+        WHERE u.id = #{id}
+    </select>
+
+    <select id="findAllUserRoles" resultType="cn.firedance.hearth.auth.admin.AdminMapper$UserRolePair">
+        SELECT ur.user_id AS userId, r.code AS roleCode
+        FROM app_user_role ur
+        JOIN app_role r ON r.id = ur.role_id
+        ORDER BY ur.user_id, r.code
+    </select>
+
+    <select id="findUserRoles" resultType="cn.firedance.hearth.auth.admin.AdminMapper$UserRolePair">
+        SELECT ur.user_id AS userId, r.code AS roleCode
+        FROM app_user_role ur
+        JOIN app_role r ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+        ORDER BY r.code
+    </select>
+
+    <select id="findStaffById" resultType="cn.firedance.hearth.auth.admin.StaffDO">
+        SELECT id, shop_id AS shopId, name, mobile, employment
+        FROM app_staff WHERE id = #{id}
+    </select>
+
+    <select id="findAllStaff" resultType="cn.firedance.hearth.auth.admin.StaffDO">
+        SELECT id, shop_id AS shopId, name, mobile, employment
+        FROM app_staff ORDER BY id
+    </select>
+
+    <select id="countByOpenid" resultType="int">
+        SELECT COUNT(*) FROM app_user WHERE openid = #{openid}
+    </select>
+
+    <insert id="insertUser" parameterType="cn.firedance.hearth.auth.admin.AdminUserDO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO app_user (shop_id, staff_id, openid, name, status)
+        VALUES (#{shopId}, #{staffId}, #{openid}, #{name}, #{status})
+    </insert>
+
+    <insert id="insertUserRole">
+        INSERT INTO app_user_role (user_id, role_id) VALUES (#{userId}, #{roleId})
+    </insert>
+
+    <delete id="deleteUserRoles">
+        DELETE FROM app_user_role WHERE user_id = #{userId}
+    </delete>
+
+    <update id="updateStatus">
+        UPDATE app_user SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <select id="findRoleIdsByCodes" resultType="java.lang.Long">
+        SELECT id FROM app_role
+        WHERE code IN
+        <foreach collection="codes" item="c" open="(" separator="," close=")">
+            #{c}
+        </foreach>
+        ORDER BY id
+    </select>
+
+</mapper>
