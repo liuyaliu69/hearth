@@ -1,6 +1,8 @@
 {
   "pages": [
-    "pages/health/index"
+    "pages/me/index",
+    "pages/health/index",
+    "pages/login/index"
   ],
   "window": {
     "navigationBarTitleText": "Hearth",

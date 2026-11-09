@@ -1,0 +1,20 @@
+<view class="container">
+
+  <view class="card">
+    <view class="card-title down">{{reason}}</view>
+    <view class="hint">
+      把下面这串发给你老板，他开通之后你再点「重新检查」就能用。
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">我的 openid</view>
+    <view class="openid" wx:if="{{openid}}">{{openid}}</view>
+    <view class="openid empty" wx:else>（这次没有拿到，点下面重新检查）</view>
+    <view class="btn" bindtap="onCopyOpenid" wx:if="{{openid}}">复制 openid</view>
+  </view>
+
+  <view class="btn btn-ghost" bindtap="onRetry" wx:if="{{!retrying}}">重新检查</view>
+  <view class="btn btn-ghost" wx:else>检查中…</view>
+
+</view>

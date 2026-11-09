@@ -36,10 +36,15 @@ if (-not $BaseUrl) {
 }
 
 function Invoke-Api {
-    param([string]$Url)
+    param([string]$Url, [string]$Method = 'GET', [string]$Json = '')
 
     try {
-        $r = Invoke-WebRequest -Uri $Url -Method Get -UseBasicParsing -TimeoutSec 10
+        $params = @{ Uri = $Url; Method = $Method; UseBasicParsing = $true; TimeoutSec = 10 }
+        if ($Json) {
+            $params['ContentType'] = 'application/json'
+            $params['Body'] = $Json
+        }
+        $r = Invoke-WebRequest @params
         return @{ Status = [int]$r.StatusCode; Body = $r.Content }
     } catch {
         $resp = $_.Exception.Response
@@ -91,6 +96,19 @@ try { $ubody = $unauth.Body | ConvertFrom-Json } catch { }
 
 $ok3 = ($unauth.Status -eq 401) -and ($null -ne $ubody) -and ($ubody.code -eq 401)
 Add-Result '未授权接口返回 401 统一 JSON' $ok3 "HTTP=$($unauth.Status)"
+
+# ---- 3. 登录接口可达且走统一 JSON ----
+# mock 模式：未开通 → 403 + data.openid
+# 真实模式：微信会拒绝假 code → 401
+# 两种都说明接口在跑；404/500 才说明坏了
+$loginReq = @{ code = 'smoke-probe' } | ConvertTo-Json -Compress
+$login = Invoke-Api "$BaseUrl/api/auth/login" 'POST' $loginReq
+$lbody = $null
+try { $lbody = $login.Body | ConvertFrom-Json } catch { }
+
+$ok4 = ($null -ne $lbody) -and (($lbody.code -eq 403) -or ($lbody.code -eq 401))
+$mode = if ($ok4 -and $lbody.code -eq 403) { 'mock' } elseif ($ok4) { 'real' } else { '?' }
+Add-Result '登录接口可达且返回统一 JSON' $ok4 "HTTP=$($login.Status) 模式=$mode"
 
 # ---- 汇总 ----
 $results | Format-Table -AutoSize

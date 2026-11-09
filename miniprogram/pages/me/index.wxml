@@ -1,0 +1,35 @@
+<view class="container">
+
+  <view class="card" wx:if="{{loading}}">
+    <view class="card-title">正在登录…</view>
+  </view>
+
+  <view class="card" wx:elif="{{error}}">
+    <view class="card-title down">出错了</view>
+    <view class="code">{{error}}</view>
+    <view class="btn" bindtap="onReload">重试</view>
+  </view>
+
+  <block wx:else>
+    <view class="card">
+      <view class="card-title">{{user.name || user.staffName || '已登录'}}</view>
+      <view class="row">
+        <text class="label">角色</text>
+        <text class="value">{{roleText || '—'}}</text>
+      </view>
+      <view class="row">
+        <text class="label">员工</text>
+        <text class="value">{{user.staffName || '未绑定'}}</text>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{needMobile}}">
+      <view class="card-title down">还差一个手机号</view>
+      <view class="hint">你的员工资料里还没有手机号。补上之后，接替你的老师或老板才能联系到你。</view>
+    </view>
+
+    <view class="btn btn-ghost" bindtap="onGoHealth">诊断页</view>
+    <view class="btn btn-ghost" bindtap="onLogout">退出登录</view>
+  </block>
+
+</view>
