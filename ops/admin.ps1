@@ -152,7 +152,12 @@ $sql = Build-Sql
 
 if ($Remote) {
     Write-Host "目标：线上库（$Server）" -ForegroundColor Cyan
-    $sql | & ssh -o BatchMode=yes -i $SshKey $Server 'set -a; . /opt/hearth/db.env; set +a; MYSQL_PWD="$DB_PASSWORD" mysql -u"$DB_USER" -h"$DB_HOST" --default-character-set=utf8mb4 "$DB_NAME" -t'
+    # 不能直接把中文 SQL 管道给 ssh：PowerShell 会按本地代码页转码，中文变 ??
+    # 走 base64（纯 ASCII）就没这个问题
+    $b64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($sql))
+    $remoteCmd = 'set -a; . /opt/hearth/db.env; set +a; echo ' + $b64 +
+    ' | base64 -d | MYSQL_PWD="$DB_PASSWORD" mysql -u"$DB_USER" -h"$DB_HOST" --default-character-set=utf8mb4 "$DB_NAME" -t'
+    & ssh -o BatchMode=yes -i $SshKey $Server $remoteCmd
 } else {
     if (-not (Test-Path $localEnv)) { throw "找不到本地凭据：$localEnv" }
     $cfg = @{}
