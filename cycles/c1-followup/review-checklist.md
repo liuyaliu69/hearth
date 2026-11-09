@@ -39,11 +39,11 @@
 | C4 | `review/batch` 服务端遍历，不传 ID 数组 | 防篡改 | |
 | C5 | `followup_review_log` 只写不读 | 已定 | |
 
-## D. 数据（`db/cloud.sql`）
+## D. 数据（`db/migrations/V002__followup_init.sql`）
 
 | # | 核对项 | 默认 | 你的结论 |
 | --- | --- | --- | --- |
-| D1 | 模块表 5 张，`followup_` 前缀 | 已定 | |
+| D1 | 模块表 **4 张 + 3 视图**，`followup_` 前缀 | 已定 | |
 | D2 | 快照按 `(snapshot_date, mobile)` 唯一 | 已定 | |
 | D3 | 疑点用独立表 `followup_flag` | 独立表 | |
 | D4 | 同一人同一天只留一条跟进记录 | 覆盖 | |

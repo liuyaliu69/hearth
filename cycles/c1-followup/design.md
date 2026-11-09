@@ -1,7 +1,8 @@
 # C1 · 设计说明书
 
-> v1.0 · 2026-11-06 · 待评审
-> 依据：`spec.md` v0.2 · `api.md` v0.2 · `wireframe.md` v0.1 · `db/cloud.sql`
+> v1.1 · 2026-11-09 · 待评审
+> 依据：`spec.md` v0.2 · `api.md` v0.2 · `wireframe.md` v0.1 · `db/migrations/V002__followup_init.sql`
+> v1.1 变更：文档依据从已删除的 `db/cloud.sql` 改为正式迁移文件；鉴权改用 C0 的 `DataScopeService`
 > 本文回答「**怎么实现**」，不是「做什么」。
 
 ---
