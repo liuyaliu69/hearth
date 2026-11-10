@@ -349,7 +349,7 @@ systemd 用 `EnvironmentFile` 注入，Spring 从环境变量读。**任何密�
 | 3 | 导入用同一个 jar 的命令行模式 | 独立脚本 | 规则双份实现，迟早分叉 |
 | 4 | 懒分发 | 导入时直接分发 | 影响「已分发仍可见」的保护条款 |
 | 5 | 不做 Redis / MQ | 引入 | 部署与运维复杂度翻倍 |
-| 6 | **未映射的 16 列存进 `extra_json`** | 直接丢弃 / 逐列加字段 | 见附录：丢弃会永久失去「取消次数/未到次数」这类潜在有用信号 |
+| 6 | **未映射的 16 列存进 `extra_json`** | 直接丢弃 / 逐列加字段 | **已定 2026-11-10**：加 JSON 列（V004），见附录 |
 
 ---
 
@@ -399,4 +399,15 @@ C2 做转化分析时很可能要用；`跟过的老师` 在老师离职交接�
 
 **做法**：`followup_snapshot` 加一列 `extra_json JSON NULL`，导入时把这 16 列原样塞进去。
 以后谁要用，再 `ALTER TABLE` 提升成正式列，并用 SQL 回填。
+
+> **状态：已定（2026-11-10）**，迁移见 `db/migrations/V004__snapshot_extra_json.sql`。
+> 该列只用于留存原始数据，不参与查询条件，因此不建索引。
+>
+> ⚠️ **查 JSON 时中文 key 必须加引号**（实测踩过）：
+> ```sql
+> -- 错：ERROR 3143 Invalid JSON path expression
+> SELECT JSON_EXTRACT(extra_json, '$.取消次数') ...
+> -- 对：
+> SELECT JSON_EXTRACT(extra_json, '$."取消次数"') ...
+> ```
 | 6 | 只测三处 | 全面覆盖 | 两周内不可能全覆盖，假装覆盖更糟 |
