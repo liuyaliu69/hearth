@@ -131,15 +131,57 @@ class SuspectRuleEngineTest {
     @Test
     @DisplayName("NO_SHOW_199：买过 199 但一次没来")
     void noShow199_hit() {
-        assertThat(eval(row("13812345678", "柒柒", 10, 0, 30, 5, 1)))
+        // 次卡剩余设 0，避免同时命中 CARD_NO_CLASS，保持本用例只测这一条
+        assertThat(eval(row("13812345678", "柒柒", 10, 0, 30, 0, 1)))
                 .containsExactly("NO_SHOW_199");
     }
 
     @Test
     @DisplayName("NO_SHOW_199：来过一次就不算、没买过也不算")
     void noShow199_miss() {
-        assertThat(eval(row("13812345678", "柒柒", 10, 1, 30, 5, 1))).isEmpty();
-        assertThat(eval(row("13812345678", "柒柒", 10, 0, 30, 5, 0))).isEmpty();
+        assertThat(eval(row("13812345678", "柒柒", 10, 1, 30, 0, 1))).isEmpty();
+        assertThat(eval(row("13812345678", "柒柒", 10, 0, 30, 0, 0))).isEmpty();
+    }
+
+    // ---------------------------------------------------------------- CARD_NO_CLASS
+
+    @Test
+    @DisplayName("CARD_NO_CLASS：有剩余课时但一次没来（真实案例：375 课时 / 0 次到课）")
+    void cardNoClass_hit() {
+        Set<String> hit = engine.evaluate(row("15971588802", "刘亚柳", null, 0, null, 375, null), Set.of());
+        assertThat(hit).containsExactly("CARD_NO_CLASS");
+    }
+
+    @Test
+    @DisplayName("CARD_NO_CLASS：来过一次就不算、没课时也不算")
+    void cardNoClass_miss() {
+        assertThat(eval(row("13812345678", "柒柒", null, 1, null, 375, null))).isEmpty();
+        assertThat(eval(row("13812345678", "柒柒", null, 0, null, 0, null))).isEmpty();
+        // 到课次数缺失时不能假定为 0，否则整批空数据会全被标成疑点
+        assertThat(eval(row("13812345678", "柒柒", null, null, null, 375, null))).isEmpty();
+    }
+
+    @Test
+    @DisplayName("数据一致时分流：从未来过只报 CARD_NO_CLASS，来过且久未到只报 SILENT_BALANCE")
+    void cardNoClassAndSilentBalanceSplitWhenDataIsConsistent() {
+        // 从未来过：距末课天数必然为空
+        Set<String> never = engine.evaluate(
+                row("13812345678", "柒柒", null, 0, null, 10, null), Set.of());
+        assertThat(never).containsExactly("CARD_NO_CLASS");
+
+        // 来过、但超过 180 天没来
+        Set<String> silent = engine.evaluate(
+                row("13812345678", "柒柒", 400, 5, null, 10, null), Set.of());
+        assertThat(silent).containsExactly("SILENT_BALANCE");
+    }
+
+    @Test
+    @DisplayName("数据自相矛盾时两条同时命中（允许一记录多标记）")
+    void bothRulesFireOnContradictoryData() {
+        // 到课次数=0，却又有距末课 400 天 —— 这本身就是数据问题，两条都该报
+        Set<String> hit = engine.evaluate(
+                row("13812345678", "柒柒", 400, 0, null, 10, null), Set.of());
+        assertThat(hit).containsExactlyInAnyOrder("SILENT_BALANCE", "CARD_NO_CLASS");
     }
 
     // ---------------------------------------------------------------- 组合与开关
@@ -149,7 +191,8 @@ class SuspectRuleEngineTest {
     void multipleHits() {
         Set<String> hit = eval(row(null, "曼曼", 200, 0, -1, 5, 1));
         assertThat(hit).containsExactlyInAnyOrder(
-                "NO_MOBILE", "TEACHER_LEFT", "SILENT_BALANCE", "STATE_CONFLICT", "NO_SHOW_199");
+                "NO_MOBILE", "TEACHER_LEFT", "SILENT_BALANCE", "STATE_CONFLICT",
+                "NO_SHOW_199", "CARD_NO_CLASS");
     }
 
     @Test

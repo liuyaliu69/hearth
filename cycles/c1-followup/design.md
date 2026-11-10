@@ -1,8 +1,9 @@
 # C1 · 设计说明书
 
-> v1.1 · 2026-11-09 · 待评审
-> 依据：`spec.md` v0.2 · `api.md` v0.2 · `wireframe.md` v0.1 · `db/migrations/V002__followup_init.sql`
-> v1.1 变更：文档依据从已删除的 `db/cloud.sql` 改为正式迁移文件；鉴权改用 C0 的 `DataScopeService`
+> v1.2 · 2026-11-10 · 待评审
+> 依据：`spec.md` v0.3 · `api.md` v0.3 · `wireframe.md` v0.1 · `db/migrations/V002__followup_init.sql`
+> v1.1：文档依据从已删除的 `db/cloud.sql` 改为正式迁移文件；鉴权改用 C0 的 `DataScopeService`
+> v1.2：疑点规则从 6 条增加到 7 条（新增 `CARD_NO_CLASS`），见 5.2 节
 > 本文回答「**怎么实现**」，不是「做什么」。
 
 ---
@@ -149,6 +150,28 @@ java -jar app.jar --spring.profiles.active=import --import=/tmp/followup.csv
 7. 打印统计：总行数 / 各疑点命中数 / 继承数 / 待核数
 
 **失败即整体回滚**。重复导入同一天会覆盖，靠 `(snapshot_date, mobile)` 唯一键。
+
+#### 疑点规则 v1.1（7 条）
+
+| 代号 | 判定 | 依赖字段 |
+| --- | --- | --- |
+| `NO_MOBILE` | 手机号为空 | `mobile` |
+| `MOBILE_BAD` | 非 11 位纯数字，或**本批次内重复** | `mobile` + 批次上下文 |
+| `SILENT_BALANCE` | 次卡剩余 > 0 且 距末课 ≥ 180 | `countcard_lessons` + `days_since_class` |
+| `STATE_CONFLICT` | 时间卡剩余 < 0 且 次卡剩余 > 0 | `timecard_days_left` + `countcard_lessons` |
+| `TEACHER_LEFT` | 分配老师在离职名单内（可配置） | `teacher_name` + 配置 |
+| `NO_SHOW_199` | 买过 199 且 到课次数 = 0 | `bought_199` + `attend_count` |
+| **`CARD_NO_CLASS`** | **次卡剩余 > 0 且 到课次数 = 0** | `countcard_lessons` + `attend_count` |
+
+> **为什么 v1.1 要加第 7 条**：
+> `SILENT_BALANCE` 依赖 `days_since_class`，但**「从未来过」的会员该字段是空的**——
+> 真实导出里 `最后上课` 与 `距末课天数` 对这类人全为空。
+> 结果是「有 375 课时、一次没来」的人一条规则都不命中。
+>
+> **两条规则的关系**：数据一致时自然分流——从未来过的人 `days_since_class` 为空，
+> 只走 `CARD_NO_CLASS`。若数据自相矛盾（到课次数 = 0 却有距末课天数），**两条会同时命中**，
+> 这是正确的：一条记录本来就允许有多个疑点，核实台会把它显示在两个分组里，
+> 而核实动作有状态保护（第二次处理时已不是 PENDING，`affected = 0`）。
 
 ### 5.3 核实 → 分发 → 跟进
 

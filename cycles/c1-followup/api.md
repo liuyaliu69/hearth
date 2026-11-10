@@ -1,6 +1,7 @@
 # C1 · 接口契约
 
-> **v0.2** · 2026-11-06
+> **v0.3** · 2026-11-10
+> v0.2 → v0.3：核实分组新增 `CARD_NO_CLASS`（买了课包没来上），与 `spec.md` v0.3 对齐。
 > 原则：**能少一个就少一个**。每多一个接口，就多一处权限漏洞。
 
 ---
@@ -69,6 +70,7 @@
     "groups": [
       { "reasonCode": "TEACHER_LEFT",  "label": "归属老师已离职", "count": 12 },
       { "reasonCode": "SILENT_BALANCE","label": "有余额但半年没来", "count": 41 },
+      { "reasonCode": "CARD_NO_CLASS", "label": "买了课包没来上",  "count": 6 },
       { "reasonCode": "MOBILE_BAD",    "label": "手机号异常",     "count": 6 },
       { "reasonCode": "STATE_CONFLICT","label": "状态矛盾",       "count": 9 },
       { "reasonCode": "NO_SHOW_199",   "label": "199 未到课",     "count": 19 },

@@ -28,9 +28,12 @@ public final class SuspectRuleEngine {
     public static final String TEACHER_LEFT = "TEACHER_LEFT";
     public static final String NO_SHOW_199 = "NO_SHOW_199";
     public static final String NO_MOBILE = "NO_MOBILE";
+    /** 买了课包但一次没来 —— SILENT_BALANCE 覆盖不到「从未来过」的人 */
+    public static final String CARD_NO_CLASS = "CARD_NO_CLASS";
 
     public static final Set<String> ALL_RULES = Set.of(
-            MOBILE_BAD, SILENT_BALANCE, STATE_CONFLICT, TEACHER_LEFT, NO_SHOW_199, NO_MOBILE);
+            MOBILE_BAD, SILENT_BALANCE, STATE_CONFLICT, TEACHER_LEFT,
+            NO_SHOW_199, NO_MOBILE, CARD_NO_CLASS);
 
     /** 「有钱没上课」的阈值：距末课 ≥ 这个天数 */
     private static final int SILENT_DAYS = 180;
@@ -78,6 +81,14 @@ public final class SuspectRuleEngine {
                 && row.daysSinceClass() != null
                 && row.daysSinceClass() >= SILENT_DAYS) {
             hit.add(SILENT_BALANCE);
+        }
+
+        // 与 SILENT_BALANCE 不重叠：有上课记录走上面，一次没来走这条。
+        // 「从未来过」的会员没有 days_since_class，SILENT_BALANCE 永远判不了。
+        if (isOn(CARD_NO_CLASS)
+                && positive(row.countcardLessons())
+                && Integer.valueOf(0).equals(row.attendCount())) {
+            hit.add(CARD_NO_CLASS);
         }
 
         if (isOn(STATE_CONFLICT)
