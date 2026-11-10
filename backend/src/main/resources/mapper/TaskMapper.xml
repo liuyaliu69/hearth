@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.firedance.hearth.followup.teacher.TaskMapper">
+
+    <!--
+      ★ 可见性单点收敛（T17）
+      全仓库只有这一处出现 review_status = 'VERIFIED'。
+      下面所有老师端查询都 include 它，新增查询也必须 include。
+      散落成多处，就一定会漏一处，然后老师看到没核过的数据。
+    -->
+    <sql id="visible">
+        s.review_status = 'VERIFIED'
+    </sql>
+
+    <sql id="latestDate">(SELECT MAX(snapshot_date) FROM followup_snapshot)</sql>
+
+    <sql id="taskColumns">
+        s.id                 AS id,
+        s.member_id          AS memberId,
+        s.member_name        AS memberName,
+        s.mobile             AS mobile,
+        s.teacher_name       AS teacherName,
+        s.tier               AS tier,
+        s.days_since_class   AS daysSinceClass,
+        s.countcard_lessons  AS countcardLessons,
+        s.timecard_days_left AS timecardDaysLeft,
+        s.timecard_expire    AS timecardExpire,
+        s.queue              AS queue,
+        s.sort_key           AS sortKey,
+        s.talk_script        AS talkScript,
+        s.last_class_date    AS lastClassDate,
+        s.dispatched_at      AS dispatchedAt,
+        CASE WHEN l.id IS NULL THEN 0 ELSE 1 END AS done,
+        l.result_code        AS resultCode,
+        l.result_text        AS resultText
+    </sql>
+
+    <sql id="scopeFilter">
+        (#{all} OR s.staff_id = #{staffId})
+    </sql>
+
+    <select id="listTasks" resultType="cn.firedance.hearth.followup.teacher.TaskRow">
+        SELECT <include refid="taskColumns"/>
+        FROM followup_snapshot s
+        LEFT JOIN followup_log l
+               ON l.member_id = s.member_id AND l.follow_date = CURDATE()
+        WHERE s.snapshot_date = <include refid="latestDate"/>
+          AND <include refid="visible"/>
+          AND s.queue &lt;&gt; 'NONE'
+          AND <include refid="scopeFilter"/>
+        ORDER BY s.sort_key, s.id
+        LIMIT #{limit}
+    </select>
+
+    <update id="markDispatched">
+        UPDATE followup_snapshot
+        SET dispatched_at = NOW()
+        WHERE dispatched_at IS NULL
+          AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+    <select id="findVisibleMember" resultType="cn.firedance.hearth.followup.teacher.TaskRow">
+        SELECT <include refid="taskColumns"/>
+        FROM followup_snapshot s
+        LEFT JOIN followup_log l
+               ON l.member_id = s.member_id AND l.follow_date = CURDATE()
+        WHERE s.id = #{snapshotId}
+          AND <include refid="visible"/>
+          AND <include refid="scopeFilter"/>
+    </select>
+
+    <select id="findVisibleByMember" resultType="cn.firedance.hearth.followup.teacher.TaskRow">
+        SELECT <include refid="taskColumns"/>
+        FROM followup_snapshot s
+        LEFT JOIN followup_log l
+               ON l.member_id = s.member_id AND l.follow_date = CURDATE()
+        WHERE s.member_id = #{memberId}
+          AND s.snapshot_date = <include refid="latestDate"/>
+          AND <include refid="visible"/>
+          AND <include refid="scopeFilter"/>
+        LIMIT 1
+    </select>
+
+    <select id="listLogs" resultType="cn.firedance.hearth.followup.teacher.FollowupLogRow">
+        SELECT id, member_id AS memberId, follow_date AS followDate,
+               result_code AS resultCode, result_text AS resultText,
+               amount, note, staff_id AS staffId, created_at AS createdAt
+        FROM followup_log
+        WHERE member_id = #{memberId}
+        ORDER BY follow_date DESC, id DESC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="upsertLog" parameterType="cn.firedance.hearth.followup.teacher.FollowupLogDO">
+        INSERT INTO followup_log
+            (shop_id, snapshot_date, member_id, staff_id, follow_date,
+             result_code, result_text, amount, note)
+        VALUES
+            (#{shopId}, #{snapshotDate}, #{memberId}, #{staffId}, #{followDate},
+             #{resultCode}, #{resultText}, #{amount}, #{note})
+        ON DUPLICATE KEY UPDATE
+            staff_id    = VALUES(staff_id),
+            result_code = VALUES(result_code),
+            result_text = VALUES(result_text),
+            amount      = VALUES(amount),
+            note        = VALUES(note)
+    </insert>
+
+    <select id="stats" resultType="cn.firedance.hearth.followup.teacher.StatsRow">
+        SELECT COUNT(*) AS total,
+               COALESCE(SUM(CASE WHEN l.id IS NULL THEN 0 ELSE 1 END), 0) AS done
+        FROM followup_snapshot s
+        LEFT JOIN followup_log l
+               ON l.member_id = s.member_id AND l.follow_date = CURDATE()
+        WHERE s.snapshot_date = <include refid="latestDate"/>
+          AND <include refid="visible"/>
+          AND s.queue &lt;&gt; 'NONE'
+          AND <include refid="scopeFilter"/>
+    </select>
+
+    <select id="statsByStaff" resultType="cn.firedance.hearth.followup.teacher.StaffStatRow">
+        SELECT s.staff_id AS staffId,
+               st.name     AS staffName,
+               COUNT(*)    AS total,
+               COALESCE(SUM(CASE WHEN l.id IS NULL THEN 0 ELSE 1 END), 0) AS done
+        FROM followup_snapshot s
+        LEFT JOIN followup_log l
+               ON l.member_id = s.member_id AND l.follow_date = CURDATE()
+        LEFT JOIN app_staff st ON st.id = s.staff_id
+        WHERE s.snapshot_date = <include refid="latestDate"/>
+          AND <include refid="visible"/>
+          AND s.queue &lt;&gt; 'NONE'
+        GROUP BY s.staff_id, st.name
+        ORDER BY total DESC
+    </select>
+
+    <select id="countPendingReview" resultType="int">
+        SELECT COUNT(*) FROM followup_snapshot
+        WHERE snapshot_date = <include refid="latestDate"/> AND review_status = 'PENDING'
+    </select>
+
+</mapper>
