@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.firedance.hearth.followup.importer.ImportMapper">
+
+    <select id="findShopIdByCode" resultType="java.lang.Long">
+        SELECT id FROM app_shop WHERE code = #{code} LIMIT 1
+    </select>
+
+    <select id="findStaffIdByName" resultType="java.lang.Long">
+        SELECT id FROM app_staff WHERE name = #{name} LIMIT 1
+    </select>
+
+    <select id="findMemberId" resultType="java.lang.Long">
+        SELECT id FROM app_member WHERE mobile = #{mobile} AND name = #{name} LIMIT 1
+    </select>
+
+    <insert id="insertMember">
+        INSERT INTO app_member (shop_id, name, mobile, owner_staff_id, source_system, status, first_seen)
+        VALUES (#{shopId}, #{name}, #{mobile}, #{ownerStaffId}, 'santi', 'ACTIVE', #{firstSeen})
+    </insert>
+
+    <delete id="deleteFlagsByDate">
+        DELETE f FROM followup_flag f
+        JOIN followup_snapshot s ON s.id = f.snapshot_id
+        WHERE s.snapshot_date = #{date}
+    </delete>
+
+    <delete id="deleteSnapshotsByDate">
+        DELETE FROM followup_snapshot WHERE snapshot_date = #{date}
+    </delete>
+
+    <select id="findPrevSnapshot" resultType="cn.firedance.hearth.followup.importer.PrevSnapshotRow">
+        SELECT id,
+               mobile        AS mobile,
+               countcard_lessons AS countcardLessons,
+               timecard_expire   AS timecardExpire,
+               teacher_name      AS teacherName,
+               review_status     AS reviewStatus,
+               review_reason     AS reviewReason,
+               dispatched_at     AS dispatchedAt
+        FROM followup_snapshot
+        WHERE mobile = #{mobile} AND snapshot_date &lt; #{date}
+        ORDER BY snapshot_date DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertSnapshot" parameterType="cn.firedance.hearth.followup.importer.SnapshotDO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO followup_snapshot
+            (shop_id, snapshot_date, import_batch, member_id, staff_id,
+             member_name, mobile, teacher_name,
+             tier, activity, last_class_date, days_since_class, attend_count,
+             timecard_expire, timecard_days_left, countcard_lessons, countcard_days_left,
+             last_sign_date, last_product, last_sign_amount, talk_script, total_paid,
+             sign_count, bought_199, timecard_kind, countcard_kind, extra_json,
+             queue, sort_key, review_status, review_reason, dispatched_at)
+        VALUES
+            (#{shopId}, #{snapshotDate}, #{importBatch}, #{memberId}, #{staffId},
+             #{memberName}, #{mobile}, #{teacherName},
+             #{tier}, #{activity}, #{lastClassDate}, #{daysSinceClass}, #{attendCount},
+             #{timecardExpire}, #{timecardDaysLeft}, #{countcardLessons}, #{countcardDaysLeft},
+             #{lastSignDate}, #{lastProduct}, #{lastSignAmount}, #{talkScript}, #{totalPaid},
+             #{signCount}, #{bought199}, #{timecardKind}, #{countcardKind}, #{extraJson},
+             #{queue}, #{sortKey}, #{reviewStatus}, #{reviewReason}, #{dispatchedAt})
+    </insert>
+
+    <insert id="insertFlag">
+        INSERT IGNORE INTO followup_flag (snapshot_id, reason_code)
+        VALUES (#{snapshotId}, #{reasonCode})
+    </insert>
+
+</mapper>

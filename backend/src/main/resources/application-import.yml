@@ -1,0 +1,23 @@
+# 导入模式（命令行）专用配置
+#
+# 用法：
+#   java -jar hearth.jar --spring.profiles.active=import --import=/tmp/followup.csv
+#
+# 该 profile 不启 Web 容器：导入是一次性批处理，不需要监听端口。
+
+spring:
+  main:
+    web-application-type: none
+
+# 导入时把 SQL 日志关掉：423 行 × 5 条 SQL 会把报告淹没
+logging:
+  level:
+    root: WARN
+    cn.firedance.hearth: INFO
+    cn.firedance.hearth.followup.importer.ImportMapper: WARN
+
+followup:
+  # 门店代号（app_shop.code）
+  shop-code: fire-buji
+  # 已离职老师：这些人的客户命中 TEACHER_LEFT 疑点
+  left-teachers: 曼曼,艺帆,璇子
