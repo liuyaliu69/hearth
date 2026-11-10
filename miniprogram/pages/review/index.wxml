@@ -1,0 +1,49 @@
+<view class="container">
+
+  <block wx:if="{{!reason}}">
+    <view class="card" wx:if="{{summary}}">
+      <view class="card-title">待核实 {{summary.pendingTotal}} 条</view>
+      <view class="hint">未核实的学员不会出现在老师端</view>
+    </view>
+
+    <view class="card" wx:if="{{loading}}"><view class="card-title">加载中…</view></view>
+    <view class="card" wx:if="{{error}}"><view class="card-title down">{{error}}</view></view>
+
+    <view class="card" wx:for="{{summary.groups}}" wx:key="reasonCode"
+          bindtap="onPickGroup" data-reason="{{item.reasonCode}}" data-label="{{item.label}}">
+      <view class="row" style="border-bottom:none">
+        <text class="label" style="font-size:30rpx;color:#1f1f1f">{{item.label}}</text>
+        <text class="value">{{item.count}} 条 ›</text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="card">
+      <view class="row" style="border-bottom:none">
+        <text class="label">{{reasonLabel}}</text>
+        <text class="value" bindtap="onBack">‹ 返回分组</text>
+      </view>
+      <view class="btn" bindtap="onBatch">整批确认这一组</view>
+    </view>
+
+    <view class="card" wx:for="{{items}}" wx:key="id">
+      <view class="row" style="border-bottom:none">
+        <text class="label" style="font-size:30rpx;color:#1f1f1f">{{item.memberName}}</text>
+        <text class="value">{{item.mobileMasked}}</text>
+      </view>
+      <view class="row"><text class="label">老师</text><text class="value">{{item.teacherName}}</text></view>
+      <view class="row"><text class="label">剩余课时</text><text class="value">{{item.countcardLessons || 0}}</text></view>
+      <view class="row"><text class="label">距末课</text><text class="value">{{item.daysSinceClass !== null ? item.daysSinceClass + ' 天' : '从未上课'}}</text></view>
+      <view class="row" style="border-bottom:none">
+        <text class="label"></text>
+        <text class="value">
+          <text class="btn-mini ok" bindtap="onAct" data-id="{{item.id}}" data-action="CONFIRM">确认</text>
+          <text class="btn-mini" bindtap="onAct" data-id="{{item.id}}" data-action="PARK">挂起</text>
+          <text class="btn-mini down" bindtap="onAct" data-id="{{item.id}}" data-action="REJECT">排除</text>
+        </text>
+      </view>
+    </view>
+  </block>
+
+</view>

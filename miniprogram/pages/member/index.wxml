@@ -1,0 +1,46 @@
+<view class="container">
+
+  <view class="card" wx:if="{{loading}}"><view class="card-title">加载中…</view></view>
+  <view class="card" wx:if="{{error}}">
+    <view class="card-title down">{{error}}</view>
+    <view class="hint">如果提示「记录不存在」，说明这条还没核实或不属于你</view>
+    <view class="btn" bindtap="load">重试</view>
+  </view>
+
+  <block wx:if="{{detail}}">
+    <view class="card">
+      <view class="card-title">{{detail.memberName}}</view>
+      <view class="row"><text class="label">手机</text><text class="value">{{detail.mobileMasked}}</text></view>
+      <view class="row"><text class="label">归属老师</text><text class="value">{{detail.teacherName || '—'}}</text></view>
+      <view class="row"><text class="label">分层</text><text class="value">{{detail.tier || '—'}}</text></view>
+      <view class="row"><text class="label">距末课</text><text class="value">{{detail.daysSinceClass ? detail.daysSinceClass + ' 天' : '从未上课'}}</text></view>
+      <view class="row"><text class="label">剩余课时</text><text class="value">{{detail.countcardLessons || 0}}</text></view>
+      <view class="row"><text class="label">时间卡剩余</text><text class="value">{{detail.timecardDaysLeft !== null ? detail.timecardDaysLeft + ' 天' : '—'}}</text></view>
+    </view>
+
+    <view class="card" wx:if="{{detail.talkScript}}">
+      <view class="card-title">话术</view>
+      <view class="code">{{detail.talkScript}}</view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">今天跟得怎么样？</view>
+      <view class="grid">
+        <view class="grid-item" wx:for="{{results}}" wx:key="code"
+              bindtap="onSubmit" data-code="{{item.code}}">{{item.text}}</view>
+      </view>
+      <view class="hint" wx:if="{{detail.doneToday}}">今天已经提交过，再提交会覆盖</view>
+    </view>
+
+    <view class="card" wx:if="{{detail.history.length}}">
+      <view class="card-title">历史记录</view>
+      <view class="row" wx:for="{{detail.history}}" wx:key="followDate">
+        <text class="label">{{item.followDate}}</text>
+        <text class="value">{{item.resultText || item.resultCode}}</text>
+      </view>
+    </view>
+
+    <view class="btn btn-ghost" bindtap="onFlag">信息有误，退回给老板</view>
+  </block>
+
+</view>

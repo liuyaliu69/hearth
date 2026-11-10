@@ -1,0 +1,13 @@
+.hint { font-size: 26rpx; color: #8a8a8a; line-height: 1.7; margin-top: 8rpx; }
+
+.btn-mini {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  margin-left: 12rpx;
+  border-radius: 8rpx;
+  background: #f2f2f2;
+  color: #333;
+  font-size: 26rpx;
+}
+.btn-mini.ok { background: #e8f8ec; color: #07a03c; }
+.btn-mini.down { background: #ffe8e8; color: #d93b3b; }

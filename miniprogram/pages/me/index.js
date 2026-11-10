@@ -1,4 +1,5 @@
 const { ensureLogin, logout } = require('../../utils/auth')
+const { request } = require('../../utils/request')
 
 const ROLE_NAMES = { owner: '老板', teacher: '老师', operator: '运营' }
 
@@ -8,8 +9,9 @@ Page({
     error: '',
     user: null,
     roleText: '',
+    isOwner: false,
     needMobile: false,
-    mobileText: ''
+    stats: null
   },
 
   onShow() {
@@ -24,20 +26,23 @@ Page({
       const roles = user.roles || []
       const roleText = roles.map(function (r) { return ROLE_NAMES[r] || r }).join('、')
 
-      getApp().globalData.user = user
-      getApp().globalData.needMobile = result.needMobile
-
       this.setData({
         loading: false,
         user: user,
         roleText: roleText,
-        needMobile: result.needMobile,
-        mobileText: ''
+        isOwner: roles.indexOf('owner') >= 0,
+        needMobile: result.needMobile
       })
+
+      // 统计失败不该影响页面
+      try {
+        const stats = await request({ url: '/api/followup/stats' })
+        this.setData({ stats: stats })
+      } catch (e) {
+        this.setData({ stats: null })
+      }
     } catch (e) {
       this.setData({ loading: false })
-
-      // 未开通：带着 openid 跳未开通页，让老师能把它发给老板
       if (e.statusCode === 403) {
         const openid = (e.data && e.data.openid) || ''
         wx.redirectTo({
@@ -46,13 +51,16 @@ Page({
         })
         return
       }
-
       this.setData({ error: e.msg || '加载失败' })
     }
   },
 
-  onReload() {
-    this.load()
+  onTasks() {
+    wx.navigateTo({ url: '/pages/tasks/index' })
+  },
+
+  onReview() {
+    wx.navigateTo({ url: '/pages/review/index' })
   },
 
   onGoHealth() {
@@ -64,9 +72,7 @@ Page({
       title: '退出登录',
       content: '退出后需要重新进入小程序才能登录',
       success: function (res) {
-        if (res.confirm) {
-          logout()
-        }
+        if (res.confirm) logout()
       }
     })
   }

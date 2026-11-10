@@ -1,6 +1,9 @@
 {
   "pages": [
     "pages/me/index",
+    "pages/tasks/index",
+    "pages/member/index",
+    "pages/review/index",
     "pages/health/index",
     "pages/login/index"
   ],

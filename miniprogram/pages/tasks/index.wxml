@@ -1,0 +1,45 @@
+<view class="container">
+
+  <view class="card" wx:if="{{!loading && !error}}">
+    <view class="card-title">今天要跟 {{total}} 人，已完成 {{doneCount}} 人</view>
+    <view class="hint">只有核实过的学员才会出现在这里</view>
+  </view>
+
+  <view class="card" wx:if="{{loading}}"><view class="card-title">加载中…</view></view>
+  <view class="card" wx:if="{{error}}">
+    <view class="card-title down">{{error}}</view>
+    <view class="btn" bindtap="load">重试</view>
+  </view>
+
+  <view class="card" wx:if="{{!loading && !error && items.length === 0}}">
+    <view class="card-title">今天没有待办</view>
+    <view class="hint">可能是都跟完了，或者老板还没核实完今天的名单</view>
+  </view>
+
+  <view class="card" wx:for="{{items}}" wx:key="id" bindtap="onOpen" data-id="{{item.id}}">
+    <view class="row" style="border-bottom:none">
+      <text class="label" style="font-size:32rpx;color:#1f1f1f;font-weight:600">
+        {{item.memberName}}
+      </text>
+      <text class="value">
+        <text wx:if="{{item.queue === 'RED'}}" class="tag-red">临期</text>
+        <text wx:elif="{{item.queue === 'ORANGE'}}" class="tag-orange">久未到</text>
+        <text wx:elif="{{item.queue === 'YELLOW'}}" class="tag-yellow">有余额</text>
+        <text wx:if="{{item.done}}" class="tag-done">已跟</text>
+      </text>
+    </view>
+    <view class="row">
+      <text class="label">剩余课时</text>
+      <text class="value">{{item.countcardLessons || '—'}}</text>
+    </view>
+    <view class="row">
+      <text class="label">距末课</text>
+      <text class="value">{{item.daysSinceClass ? item.daysSinceClass + ' 天' : '—'}}</text>
+    </view>
+    <view class="row">
+      <text class="label">手机</text>
+      <text class="value">{{item.mobileMasked}}</text>
+    </view>
+  </view>
+
+</view>
