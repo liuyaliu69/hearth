@@ -25,7 +25,7 @@ class SuspectRuleEngineTest {
                                  Integer attendCount, Integer timecardDaysLeft,
                                  Integer countcardLessons, Integer bought199) {
         return new ImportRow("张艳", mobile, teacher, daysSinceClass, attendCount,
-                timecardDaysLeft, countcardLessons, bought199, java.util.Map.of());
+                timecardDaysLeft, countcardLessons, null, bought199, java.util.Map.of());
     }
 
     private Set<String> eval(ImportRow row) {
