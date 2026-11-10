@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/health", "/api/auth/login").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("OWNER")
+                        // 核实工作台：只有老板能看未核实的数据
+                        .requestMatchers("/api/followup/review/**").hasRole("OWNER")
                         .anyRequest().authenticated())
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable())

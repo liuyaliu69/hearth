@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.firedance.hearth.followup.review.ReviewMapper">
+
+    <sql id="latestDate">(SELECT MAX(snapshot_date) FROM followup_snapshot)</sql>
+
+    <sql id="itemColumns">
+        s.id                AS id,
+        s.member_id         AS memberId,
+        s.staff_id          AS staffId,
+        s.member_name       AS memberName,
+        s.mobile            AS mobile,
+        s.teacher_name      AS teacherName,
+        s.tier              AS tier,
+        s.activity          AS activity,
+        s.days_since_class  AS daysSinceClass,
+        s.countcard_lessons AS countcardLessons,
+        s.timecard_days_left AS timecardDaysLeft,
+        s.timecard_expire   AS timecardExpire,
+        s.queue             AS queue,
+        s.sort_key          AS sortKey,
+        s.review_status     AS reviewStatus,
+        s.review_reason     AS reviewReason,
+        s.talk_script       AS talkScript,
+        s.dispatched_at     AS dispatchedAt,
+        (SELECT GROUP_CONCAT(f.reason_code ORDER BY f.reason_code)
+           FROM followup_flag f WHERE f.snapshot_id = s.id) AS flags
+    </sql>
+
+    <select id="countPending" resultType="int">
+        SELECT COUNT(*) FROM followup_snapshot
+        WHERE snapshot_date = <include refid="latestDate"/> AND review_status = 'PENDING'
+    </select>
+
+    <select id="countUrgent" resultType="int">
+        SELECT COUNT(*) FROM followup_snapshot
+        WHERE snapshot_date = <include refid="latestDate"/>
+          AND review_status = 'PENDING' AND queue = 'RED'
+    </select>
+
+    <select id="countByReason" resultType="cn.firedance.hearth.followup.review.ReviewMapper$ReasonCount">
+        SELECT f.reason_code AS reasonCode, COUNT(DISTINCT s.id) AS cnt
+        FROM followup_flag f
+        JOIN followup_snapshot s ON s.id = f.snapshot_id
+        WHERE s.snapshot_date = <include refid="latestDate"/> AND s.review_status = 'PENDING'
+        GROUP BY f.reason_code
+    </select>
+
+    <select id="countClean" resultType="int">
+        SELECT COUNT(*) FROM followup_snapshot s
+        WHERE s.snapshot_date = <include refid="latestDate"/> AND s.review_status = 'PENDING'
+          AND NOT EXISTS (SELECT 1 FROM followup_flag f WHERE f.snapshot_id = s.id)
+    </select>
+
+    <select id="listByReason" resultType="cn.firedance.hearth.followup.review.ReviewItemRow">
+        SELECT <include refid="itemColumns"/>
+        FROM followup_snapshot s
+        WHERE s.snapshot_date = <include refid="latestDate"/>
+          AND s.review_status = 'PENDING'
+          AND EXISTS (SELECT 1 FROM followup_flag f
+                      WHERE f.snapshot_id = s.id AND f.reason_code = #{reason})
+        ORDER BY s.sort_key, s.id
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="listClean" resultType="cn.firedance.hearth.followup.review.ReviewItemRow">
+        SELECT <include refid="itemColumns"/>
+        FROM followup_snapshot s
+        WHERE s.snapshot_date = <include refid="latestDate"/>
+          AND s.review_status = 'PENDING'
+          AND NOT EXISTS (SELECT 1 FROM followup_flag f WHERE f.snapshot_id = s.id)
+        ORDER BY s.sort_key, s.id
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="findItem" resultType="cn.firedance.hearth.followup.review.ReviewItemRow">
+        SELECT <include refid="itemColumns"/>
+        FROM followup_snapshot s WHERE s.id = #{id}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE followup_snapshot
+        SET review_status = #{status},
+            review_reason = #{reason},
+            review_note   = #{note},
+            reviewed_by   = #{reviewedBy},
+            reviewed_at   = #{reviewedAt}
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateMobile">
+        UPDATE followup_snapshot SET mobile = #{mobile} WHERE id = #{id}
+    </update>
+
+    <update id="updateCountcard">
+        UPDATE followup_snapshot SET countcard_lessons = #{lessons} WHERE id = #{id}
+    </update>
+
+    <update id="updateTimecardExpire">
+        UPDATE followup_snapshot SET timecard_expire = #{expire} WHERE id = #{id}
+    </update>
+
+    <update id="updateTeacher">
+        UPDATE followup_snapshot
+        SET teacher_name = #{teacherName}, staff_id = #{staffId}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertLog" parameterType="cn.firedance.hearth.followup.review.ReviewLogDO">
+        INSERT INTO followup_review_log
+            (snapshot_id, member_id, staff_id, action, field_name, old_value, new_value, note)
+        VALUES
+            (#{snapshotId}, #{memberId}, #{staffId}, #{action}, #{fieldName},
+             #{oldValue}, #{newValue}, #{note})
+    </insert>
+
+    <select id="findBatchIds" resultType="java.lang.Long">
+        SELECT s.id FROM followup_snapshot s
+        WHERE s.snapshot_date = <include refid="latestDate"/>
+          AND s.review_status = 'PENDING'
+        <choose>
+            <when test="reason == 'URGENT'">AND s.queue = 'RED'</when>
+            <when test="reason == null or reason == 'CLEAN'">
+                AND NOT EXISTS (SELECT 1 FROM followup_flag f WHERE f.snapshot_id = s.id)
+            </when>
+            <otherwise>
+                AND EXISTS (SELECT 1 FROM followup_flag f
+                            WHERE f.snapshot_id = s.id AND f.reason_code = #{reason})
+            </otherwise>
+        </choose>
+        ORDER BY s.sort_key, s.id
+        LIMIT #{limit}
+    </select>
+
+    <update id="updateStatusByIds">
+        UPDATE followup_snapshot
+        SET review_status = #{status},
+            review_reason = 'MANUAL',
+            reviewed_by   = #{reviewedBy},
+            reviewed_at   = #{reviewedAt}
+        WHERE review_status = 'PENDING'
+          AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+    <insert id="insertLogBatch">
+        INSERT INTO followup_review_log (snapshot_id, member_id, staff_id, action, note)
+        SELECT s.id, s.member_id, #{staffId}, #{action}, #{note}
+        FROM followup_snapshot s
+        WHERE s.id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </insert>
+
+</mapper>
