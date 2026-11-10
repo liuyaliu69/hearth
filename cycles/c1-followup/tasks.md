@@ -23,8 +23,8 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | T01 | 迁移：followup 四表三视图 | `db/migrations/V002__followup_init.sql` | — / 4 表 + 3 视图 | `show tables` 11 张（含平台表） | — | ✅ P0 已建 |
 | T02 | 员工与账号 | `ops/admin.ps1` | — / 3 条员工 + 账号 | `admin.ps1 staff` 返回 3 行 | T01 | 🟡 本地 3 人，线上 1 人 |
-| T03 | CSV 解析器 | `followup/importer/CsvParser.java` | CSV / `List<SnapshotDO>` | 20 行样例跑通，错列为 0 | T01 | ⬜ |
-| T04 | 疑点规则引擎 | `followup/importer/SuspectRuleEngine.java` | `SnapshotDO` / `Set<String>` | 6 条规则各 1 命中 + 1 不命中 | T03 | ⬜ |
+| T03 | CSV 解析器 | `followup/importer/CsvParser.java` | CSV / `List<SnapshotDO>` | 20 行样例跑通，错列为 0 | T01 | ✅ |
+| T04 | 疑点规则引擎 | `followup/importer/SuspectRuleEngine.java` | `SnapshotDO` / `Set<String>` | 6 条规则各 1 命中 + 1 不命中 | T03 | ✅ |
 | T05 | 继承逻辑 | `followup/importer/InheritanceResolver.java` | 新旧两版 / `review_status` | 4 字段 × 变/不变 = 16 组合全过 | T03 | ⬜ |
 | T06 | 导入主流程 | `followup/importer/ImportRunner.java` | `--import=xxx.csv` / 统计 | 全量导入成功，打印命中率 | T04,T05 | ⬜ |
 | T07 | 核实分组统计 | `followup/web/ReviewController.java` | — / `pendingTotal`+`urgent`+`groups[]` | 返回 6 个分组；`urgent.count` 与手写 SQL 一致 | C0 ✅ | ⬜ |
@@ -96,4 +96,4 @@ T26 → T27 → T28                           （收尾）
 
 | 总数 | 已完成 | 部分完成 | 未开始 |
 | --- | --- | --- | --- |
-| 28 | 6（T01,T19,T20,T27,T28 + T26 部分） | 3（T02,T24,T26） | 19 |
+| 28 | 7（T01,T03,T04,T19,T20,T27,T28） | 3（T02,T24,T26） | 18 |
