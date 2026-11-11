@@ -198,7 +198,7 @@
 
 /* ---------------- 代码/长文本块 ---------------- */
 .code {
-  background: #F7F8FA;
+  background: var(--c-fill);
   border-radius: var(--r-sm);
   padding: var(--sp-3);
   font-size: var(--fs-sm);

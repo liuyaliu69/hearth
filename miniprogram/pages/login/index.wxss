@@ -2,7 +2,7 @@
   font-family: Consolas, Menlo, monospace;
   font-size: var(--fs-sm);
   word-break: break-all;
-  background: #F7F8FA;
+  background: var(--c-fill);
   border-radius: var(--r-sm);
   padding: var(--sp-3);
   color: var(--c-text-2);

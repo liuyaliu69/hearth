@@ -22,5 +22,5 @@
 }
 
 .grid-item:active {
-  background: #FFE4D6;
+  background: var(--c-brand-press);
 }

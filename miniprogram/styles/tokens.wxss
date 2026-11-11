@@ -20,8 +20,10 @@ page {
   /* ---------- 背景与分割 ---------- */
   --c-bg: #F4F5F7;             /* 页面底：比纯白灰一点，白块才立得起来 */
   --c-surface: #FFFFFF;
+  --c-fill: #F7F8FA;           /* 浅填充块（代码块、openid） */
   --c-divider: #F0F1F3;
   --c-border: #E4E6E9;
+  --c-brand-press: #FFE4D6;    /* 品牌色浅块按下态 */
 
   /* ---------- 语义 ---------- */
   --c-success: #12B76A;
