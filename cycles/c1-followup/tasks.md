@@ -40,7 +40,7 @@
 | T17 | 可见性单点收敛 | `followup/mapper/SnapshotMapper.xml` | — / 唯一查询 | 全仓库只有一处 `review_status='VERIFIED'` | T12 | ✅ |
 | T18 | 越权返回 404 | `followup/service/*` | 他人 memberId / 404 | 三水 token 请求柒柒名下 → 404 非 403 | T13 | ✅ |
 | T19 | 小程序骨架 | `app.js`、`utils/request.js`、`config/env.js` | — / 可运行空壳 | 开发者工具能打开，env 切换生效 | — | ✅ C0 已建 |
-| T20 | 小程序登录 | `utils/auth.js`、`pages/login` | — / token 存本地 | 登录后请求自动带头 | T19 | ✅ C0 已建 |
+| T20 | 小程序登录 | `utils/auth.js`、`pages/login` | — / token 存本地 | 登录后请求自动带头 | T19 | ✅ C0 已建 · 开发工具验证 |
 | T21 | 待办列表页 | `pages/tasks/` | — / 列表 | 显示真实数据，临期在最上 | T20 ✅,T12 | ✅ |
 | T22 | 学员详情页 | `pages/member/` | `id` / 详情 | 结果码可提交，进度更新 | T21,T14 | ✅ |
 | T23 | 核实工作台 | `pages/review/` | — / 折叠分组 | 完成一次整批确认，折叠不跳页 | T20 ✅,T10 | ✅ |
@@ -96,4 +96,4 @@ T26 → T27 → T28                           （收尾）
 
 | 总数 | 已完成 | 部分完成 | 未开始 |
 | --- | --- | --- | --- |
-| 28 | 27 | 1（T20 小程序联调需人工在开发者工具确认） | 0 |
+| 28 | **28** | 0（真机/体验版验收留到老师真正使用前） | 0 |
