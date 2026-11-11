@@ -1,13 +1,28 @@
-.hint { font-size: 26rpx; color: #8a8a8a; line-height: 1.7; margin-top: 8rpx; }
-
-.btn-mini {
-  display: inline-block;
-  padding: 8rpx 20rpx;
-  margin-left: 12rpx;
-  border-radius: 8rpx;
-  background: #f2f2f2;
-  color: #333;
-  font-size: 26rpx;
+/* 行内动作按钮：用组件层的 btn--sm 再加一点间距控制 */
+.act-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: var(--sp-2);
+  border-top: var(--hairline) solid var(--c-divider);
+  margin-top: var(--sp-2);
 }
-.btn-mini.ok { background: #e8f8ec; color: #07a03c; }
-.btn-mini.down { background: #ffe8e8; color: #d93b3b; }
+
+.act-row .btn--sm {
+  margin-left: var(--sp-1);
+}
+
+.act-row .btn--sm.ok {
+  background: var(--c-success-weak);
+  color: var(--c-success);
+}
+
+.act-row .btn--sm.warn {
+  background: var(--c-warning-weak);
+  color: var(--c-warning);
+}
+
+.act-row .btn--sm.down {
+  background: var(--c-danger-weak);
+  color: var(--c-danger);
+}

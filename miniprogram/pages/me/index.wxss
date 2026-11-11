@@ -1,6 +1,15 @@
-.hint {
-  font-size: 26rpx;
-  color: #8a8a8a;
-  line-height: 1.7;
-  margin-top: 12rpx;
+/* 我的页：统计块布局 */
+.stat-block {
+  display: flex;
+  justify-content: space-around;
+  padding: var(--sp-2) 0 0;
+}
+
+.stat-cell {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-cell + .stat-cell {
+  border-left: var(--hairline) solid var(--c-divider);
 }

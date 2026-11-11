@@ -1,12 +1,1 @@
-.hint { font-size: 26rpx; color: #8a8a8a; line-height: 1.7; margin-top: 8rpx; }
-
-.tag-red, .tag-orange, .tag-yellow, .tag-done {
-  font-size: 22rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
-  margin-left: 8rpx;
-}
-.tag-red { background: #ffe8e8; color: #d93b3b; }
-.tag-orange { background: #fff0e0; color: #d97a00; }
-.tag-yellow { background: #fffbe0; color: #a08a00; }
-.tag-done { background: #e8f8ec; color: #07a03c; }
+/* 标签样式已全部提到 styles/components.wxss，这里只留页面特有布局 */

@@ -1,0 +1,217 @@
+/* ============================================================
+ * ③ 组件层 —— 只用令牌，不写死数值
+ *
+ * 命名：BEM-lite（block、block__element、block--modifier）。
+ * 这里同时保留旧的 card/row/label/value 写法，避免页面大改。
+ * ============================================================ */
+
+/* ---------------- 卡片 / 分组 ---------------- */
+.card {
+  background: var(--c-surface);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-3);
+  box-shadow: var(--shadow-card);
+}
+
+/* 卡片标题：比正文大一号、加粗、下面留一点气口 */
+.card-title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
+  color: var(--c-text);
+  margin-bottom: var(--sp-2);
+}
+
+/* 分组小标题（在白块外面，灰色小字） */
+.section-title {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin: var(--sp-3) var(--sp-1) var(--sp-2);
+}
+
+/* ---------------- 行（键值对） ---------------- */
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--sp-3) 0;
+  border-bottom: var(--hairline) solid var(--c-divider);
+  font-size: var(--fs-md);
+}
+
+.row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.row:first-child {
+  padding-top: 0;
+}
+
+.label {
+  color: var(--c-text-2);
+  flex-shrink: 0;
+  margin-right: var(--sp-3);
+}
+
+.value {
+  color: var(--c-text);
+  text-align: right;
+  word-break: break-all;
+  font-weight: var(--fw-medium);
+}
+
+/* ---------------- 标签 ---------------- */
+.tag {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  padding: 2rpx var(--sp-1);
+  border-radius: var(--r-sm);
+  margin-left: var(--sp-1);
+  background: var(--c-divider);
+  color: var(--c-text-2);
+}
+
+.tag--danger { background: var(--c-danger-weak); color: var(--c-danger); }
+.tag--warning { background: var(--c-warning-weak); color: var(--c-warning); }
+.tag--success { background: var(--c-success-weak); color: var(--c-success); }
+.tag--info { background: var(--c-info-weak); color: var(--c-info); }
+.tag--brand { background: var(--c-brand-weak); color: var(--c-brand); }
+
+/* 旧类名兼容 */
+.tag-red { background: var(--c-danger-weak); color: var(--c-danger); font-size: var(--fs-xs); padding: 2rpx var(--sp-1); border-radius: var(--r-sm); margin-left: var(--sp-1); }
+.tag-orange { background: var(--c-warning-weak); color: var(--c-warning); font-size: var(--fs-xs); padding: 2rpx var(--sp-1); border-radius: var(--r-sm); margin-left: var(--sp-1); }
+.tag-yellow { background: var(--c-warning-weak); color: var(--c-warning); font-size: var(--fs-xs); padding: 2rpx var(--sp-1); border-radius: var(--r-sm); margin-left: var(--sp-1); }
+.tag-done { background: var(--c-success-weak); color: var(--c-success); font-size: var(--fs-xs); padding: 2rpx var(--sp-1); border-radius: var(--r-sm); margin-left: var(--sp-1); }
+
+/* ---------------- 按钮 ---------------- */
+.btn {
+  display: block;
+  width: 100%;
+  padding: var(--sp-3) 0;
+  margin-top: var(--sp-2);
+  border-radius: var(--r-md);
+  background: var(--c-brand);
+  color: var(--c-text-inverse);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.btn:active {
+  background: var(--c-brand-dark);
+}
+
+/* 次要按钮：白底 + 细描边 */
+.btn--ghost {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border: var(--hairline) solid var(--c-border);
+}
+
+.btn--ghost:active {
+  background: var(--c-divider);
+}
+
+/* 危险按钮 */
+.btn--danger {
+  background: var(--c-surface);
+  color: var(--c-danger);
+  border: var(--hairline) solid var(--c-danger-weak);
+}
+
+/* 小号按钮（列表内联） */
+.btn--sm {
+  display: inline-block;
+  width: auto;
+  padding: var(--sp-1) var(--sp-2);
+  margin: 0 0 0 var(--sp-1);
+  font-size: var(--fs-sm);
+  border-radius: var(--r-sm);
+  background: var(--c-divider);
+  color: var(--c-text-2);
+}
+
+/* 旧类名兼容 */
+.btn-ghost { background: var(--c-surface); color: var(--c-text); border: var(--hairline) solid var(--c-border); }
+
+/* ---------------- 大数字统计 ---------------- */
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+}
+
+.stat__value {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--c-text);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat__unit {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+}
+
+.stat__label {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin-top: var(--sp-1);
+}
+
+/* ---------------- 空状态 / 提示 ---------------- */
+.empty {
+  padding: var(--sp-6) 0;
+  text-align: center;
+}
+
+.empty__title {
+  font-size: var(--fs-md);
+  color: var(--c-text-2);
+}
+
+.empty__desc {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin-top: var(--sp-1);
+  line-height: 1.7;
+}
+
+/* 提示卡（偏警告） */
+.notice {
+  background: var(--c-warning-weak);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: #8A5A00;
+  line-height: 1.7;
+}
+
+.notice--danger {
+  background: var(--c-danger-weak);
+  color: #9B2C24;
+}
+
+/* ---------------- 代码/长文本块 ---------------- */
+.code {
+  background: #F7F8FA;
+  border-radius: var(--r-sm);
+  padding: var(--sp-3);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--c-text-2);
+}
+
+/* 辅助说明文字 */
+.hint {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  line-height: 1.7;
+  margin-top: var(--sp-1);
+}

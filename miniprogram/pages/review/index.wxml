@@ -35,13 +35,10 @@
       <view class="row"><text class="label">老师</text><text class="value">{{item.teacherName}}</text></view>
       <view class="row"><text class="label">剩余课时</text><text class="value">{{item.countcardLessons || 0}}</text></view>
       <view class="row"><text class="label">距末课</text><text class="value">{{item.daysSinceClass !== null ? item.daysSinceClass + ' 天' : '从未上课'}}</text></view>
-      <view class="row" style="border-bottom:none">
-        <text class="label"></text>
-        <text class="value">
-          <text class="btn-mini ok" bindtap="onAct" data-id="{{item.id}}" data-action="CONFIRM">确认</text>
-          <text class="btn-mini" bindtap="onAct" data-id="{{item.id}}" data-action="PARK">挂起</text>
-          <text class="btn-mini down" bindtap="onAct" data-id="{{item.id}}" data-action="REJECT">排除</text>
-        </text>
+      <view class="act-row">
+        <view class="btn btn--sm ok" bindtap="onAct" data-id="{{item.id}}" data-action="CONFIRM">确认</view>
+        <view class="btn btn--sm warn" bindtap="onAct" data-id="{{item.id}}" data-action="PARK">挂起</view>
+        <view class="btn btn--sm down" bindtap="onAct" data-id="{{item.id}}" data-action="REJECT">排除</view>
       </view>
     </view>
   </block>

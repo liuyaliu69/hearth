@@ -1,18 +1,26 @@
-.hint { font-size: 26rpx; color: #8a8a8a; line-height: 1.7; margin-top: 8rpx; }
-
+/* 结果码九宫格：只写布局，颜色字号全部走令牌 */
 .grid {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 12rpx;
+  margin-top: var(--sp-2);
 }
 
 .grid-item {
-  width: 30%;
-  margin: 0 3% 16rpx 0;
-  padding: 20rpx 0;
+  width: 31%;
+  margin: 0 3.5% var(--sp-2) 0;
+  padding: var(--sp-3) 0;
   text-align: center;
-  background: #f2f7f3;
-  border-radius: 12rpx;
-  font-size: 28rpx;
-  color: #146b34;
+  background: var(--c-brand-weak);
+  border-radius: var(--r-md);
+  font-size: var(--fs-md);
+  color: var(--c-brand-dark);
+  font-weight: var(--fw-medium);
+}
+
+.grid-item:nth-child(3n) {
+  margin-right: 0;
+}
+
+.grid-item:active {
+  background: #FFE4D6;
 }

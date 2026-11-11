@@ -26,17 +26,19 @@
 
     <view class="card" wx:if="{{stats}}">
       <view class="card-title">今天</view>
-      <view class="row">
-        <text class="label">待跟进</text>
-        <text class="value">{{stats.total}} 人</text>
-      </view>
-      <view class="row">
-        <text class="label">已跟进</text>
-        <text class="value">{{stats.done}} 人</text>
-      </view>
-      <view class="row" wx:if="{{isOwner}}">
-        <text class="label">待核实</text>
-        <text class="value down">{{stats.pendingReview}} 条</text>
+      <view class="stat-block">
+        <view class="stat-cell">
+          <view class="stat__value num">{{stats.total}}</view>
+          <view class="stat__label">待跟进</view>
+        </view>
+        <view class="stat-cell">
+          <view class="stat__value num t-success">{{stats.done}}</view>
+          <view class="stat__label">已跟进</view>
+        </view>
+        <view class="stat-cell" wx:if="{{isOwner}}">
+          <view class="stat__value num t-danger">{{stats.pendingReview}}</view>
+          <view class="stat__label">待核实</view>
+        </view>
       </view>
     </view>
 

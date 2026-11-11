@@ -1,0 +1,39 @@
+/* ============================================================
+ * ② 基础层 —— 页面底子，不含任何组件样式
+ * ============================================================ */
+
+page {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+view,
+text,
+button,
+input,
+textarea {
+  box-sizing: border-box;
+}
+
+/* 页面统一容器：左右 24，底部留出安全区 */
+.container {
+  padding: var(--sp-3);
+  padding-bottom: calc(var(--sp-5) + var(--safe-bottom));
+}
+
+/* 文字层级：全站只用这四个 */
+.t-primary { color: var(--c-text); }
+.t-secondary { color: var(--c-text-2); }
+.t-muted { color: var(--c-text-3); }
+.t-brand { color: var(--c-brand); }
+.t-danger { color: var(--c-danger); }
+.t-success { color: var(--c-success); }
+
+/* 数字等宽，避免跳动 */
+.num {
+  font-variant-numeric: tabular-nums;
+}
