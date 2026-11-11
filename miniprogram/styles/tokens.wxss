@@ -37,6 +37,10 @@ page {
   --c-danger-weak: #FEECEB;
   --c-info-weak: #EAF3FE;
 
+  /* 浅底上的深色文字（对比度足够，不用纯语义色） */
+  --c-warning-text: #8A5A00;
+  --c-danger-text: #9B2C24;
+
   /* ---------- 间距（4 的倍数） ---------- */
   --sp-1: 8rpx;
   --sp-2: 16rpx;

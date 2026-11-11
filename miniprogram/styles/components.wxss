@@ -187,13 +187,13 @@
   border-radius: var(--r-md);
   padding: var(--sp-3);
   font-size: var(--fs-sm);
-  color: #8A5A00;
+  color: var(--c-warning-text);
   line-height: 1.7;
 }
 
 .notice--danger {
   background: var(--c-danger-weak);
-  color: #9B2C24;
+  color: var(--c-danger-text);
 }
 
 /* ---------------- 代码/长文本块 ---------------- */
