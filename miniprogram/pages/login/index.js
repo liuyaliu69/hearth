@@ -34,7 +34,7 @@ Page({
     try {
       const result = await ensureLogin()
       if (result && result.user) {
-        wx.reLaunch({ url: '/pages/me/index' })
+        wx.reLaunch({ url: '/pages/home/index' })
         return
       }
       wx.showToast({ title: '还没开通', icon: 'none' })
