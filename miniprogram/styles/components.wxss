@@ -181,6 +181,91 @@
   line-height: 1.7;
 }
 
+/* ---------------- 进度条 ---------------- */
+.bar {
+  height: 12rpx;
+  border-radius: var(--r-pill);
+  background: var(--c-divider);
+  overflow: hidden;
+  margin-top: var(--sp-3);
+}
+
+.bar__fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--c-brand);
+  transition: width 0.3s ease;
+}
+
+/* ---------------- 英雄区（首页顶部） ---------------- */
+.hero-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-1) var(--sp-3);
+}
+
+.hero-head__greet {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--c-text);
+  line-height: 1.3;
+}
+
+.hero-head__date {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin-top: var(--sp-1);
+}
+
+.hero-head__link {
+  font-size: var(--fs-sm);
+  color: var(--c-text-2);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+}
+
+/* ---------------- 可点入口行 ---------------- */
+.entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) 0;
+  border-bottom: var(--hairline) solid var(--c-divider);
+}
+
+.entry:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.entry:first-child {
+  padding-top: 0;
+}
+
+.entry__main {
+  flex: 1;
+}
+
+.entry__title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-medium);
+  color: var(--c-text);
+}
+
+.entry__desc {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin-top: 4rpx;
+}
+
+.entry__arrow {
+  font-size: var(--fs-sm);
+  color: var(--c-text-3);
+  margin-left: var(--sp-2);
+}
+
 /* 提示卡（偏警告） */
 .notice {
   background: var(--c-warning-weak);

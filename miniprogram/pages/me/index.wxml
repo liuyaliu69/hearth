@@ -1,13 +1,13 @@
 <view class="container">
 
   <view class="card" wx:if="{{loading}}">
-    <view class="card-title">正在登录…</view>
+    <view class="hint">加载中…</view>
   </view>
 
   <view class="card" wx:elif="{{error}}">
-    <view class="card-title down">出错了</view>
+    <view class="card-title t-danger">出错了</view>
     <view class="code">{{error}}</view>
-    <view class="btn" bindtap="load">重试</view>
+    <view class="btn mt-2" bindtap="load">重试</view>
   </view>
 
   <block wx:else>
@@ -17,36 +17,32 @@
         <text class="label">角色</text>
         <text class="value">{{roleText || '—'}}</text>
       </view>
-    </view>
-
-    <view class="card" wx:if="{{needMobile}}">
-      <view class="card-title down">还差一个手机号</view>
-      <view class="hint">员工资料里没有手机号，补上之后老板才能联系到你</view>
-    </view>
-
-    <view class="card" wx:if="{{stats}}">
-      <view class="card-title">今天</view>
-      <view class="stat-block">
-        <view class="stat-cell">
-          <view class="stat__value num">{{stats.total}}</view>
-          <view class="stat__label">待跟进</view>
-        </view>
-        <view class="stat-cell">
-          <view class="stat__value num t-success">{{stats.done}}</view>
-          <view class="stat__label">已跟进</view>
-        </view>
-        <view class="stat-cell" wx:if="{{isOwner}}">
-          <view class="stat__value num t-danger">{{stats.pendingReview}}</view>
-          <view class="stat__label">待核实</view>
-        </view>
+      <view class="row">
+        <text class="label">员工</text>
+        <text class="value">{{user.staffName || '未绑定'}}</text>
       </view>
     </view>
 
-    <view class="btn" bindtap="onTasks">今日待办</view>
-    <view class="btn" wx:if="{{isOwner}}" bindtap="onReview">核实工作台</view>
+    <view class="notice notice--danger mb-2" wx:if="{{needMobile}}">
+      员工资料里没有手机号。补上之后，老板或接替你的老师才能联系到你。
+    </view>
 
-    <view class="btn btn-ghost" bindtap="onGoHealth">诊断页</view>
-    <view class="btn btn-ghost" bindtap="onLogout">退出登录</view>
+    <view class="card">
+      <view class="entry" bindtap="onGoHealth">
+        <view class="entry__main">
+          <view class="entry__title">诊断</view>
+          <view class="entry__desc">看后端与数据库是否正常</view>
+        </view>
+        <view class="entry__arrow">›</view>
+      </view>
+      <view class="entry" bindtap="onLogout">
+        <view class="entry__main">
+          <view class="entry__title">退出登录</view>
+          <view class="entry__desc">清掉本机登录态</view>
+        </view>
+        <view class="entry__arrow">›</view>
+      </view>
+    </view>
   </block>
 
 </view>

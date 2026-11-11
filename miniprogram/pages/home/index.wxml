@@ -1,0 +1,94 @@
+<view class="container">
+
+  <!-- 顶部问候 -->
+  <view class="hero-head">
+    <view>
+      <view class="hero-head__greet">你好，{{user.name || user.staffName || ''}}</view>
+      <view class="hero-head__date">{{dateText}}</view>
+    </view>
+    <view class="hero-head__link" bindtap="onMe">我的</view>
+  </view>
+
+  <view class="card" wx:if="{{loading}}">
+    <view class="hint">加载中…</view>
+  </view>
+
+  <view class="card" wx:if="{{error}}">
+    <view class="card-title t-danger">加载失败</view>
+    <view class="hint">{{error}}</view>
+    <view class="btn mt-2" bindtap="load">重试</view>
+  </view>
+
+  <block wx:if="{{!loading && !error && stats}}">
+    <!-- 今日进度 -->
+    <view class="card">
+      <view class="flex-between">
+        <view>
+          <view class="stat">
+            <text class="stat__value">{{stats.done}}</text>
+            <text class="stat__unit">/ {{stats.total}} 人已跟</text>
+          </view>
+          <view class="stat__label">今天的跟进进度</view>
+        </view>
+        <view class="text-right">
+          <view class="stat__value num t-brand">{{progress}}%</view>
+        </view>
+      </view>
+      <view class="bar">
+        <view class="bar__fill" style="width: {{progress}}%"></view>
+      </view>
+    </view>
+
+    <!-- 待核实（仅老板） -->
+    <view class="card" wx:if="{{isOwner}}" bindtap="onReview">
+      <view class="flex-between">
+        <view class="entry__main">
+          <view class="entry__title">
+            待核实
+            <text class="tag tag--danger" wx:if="{{stats.pendingReview > 0}}">{{stats.pendingReview}}</text>
+          </view>
+          <view class="entry__desc">未核实的学员不会出现在老师端</view>
+        </view>
+        <view class="entry__arrow">去核实 ›</view>
+      </view>
+    </view>
+
+    <!-- 未补手机号提醒 -->
+    <view class="notice mb-2" wx:if="{{needMobile}}">
+      你的员工资料里还没有手机号，补上之后老板才能联系到你。
+    </view>
+
+    <!-- 主要入口 -->
+    <view class="card">
+      <view class="entry" bindtap="onTasks">
+        <view class="entry__main">
+          <view class="entry__title">今日待办</view>
+          <view class="entry__desc">{{stats.total > 0 ? '还有 ' + (stats.total - stats.done) + ' 人没跟' : '今天没有待跟进的人'}}</view>
+        </view>
+        <view class="entry__arrow">›</view>
+      </view>
+      <view class="entry" bindtap="onMe">
+        <view class="entry__main">
+          <view class="entry__title">我的</view>
+          <view class="entry__desc">账号、手机号、诊断与退出</view>
+        </view>
+        <view class="entry__arrow">›</view>
+      </view>
+    </view>
+
+    <!-- 老师进度（仅老板） -->
+    <block wx:if="{{isOwner && stats.byStaff.length}}">
+      <view class="section-title">老师今日进度</view>
+      <view class="card">
+        <view class="row" wx:for="{{stats.byStaff}}" wx:key="staffId">
+          <text class="label">{{item.staffName || '未分配'}}</text>
+          <text class="value">
+            {{item.done}} / {{item.total}}
+            <text class="tag" wx:if="{{item.total > 0 && item.done === item.total}}">已完成</text>
+          </text>
+        </view>
+      </view>
+    </block>
+  </block>
+
+</view>

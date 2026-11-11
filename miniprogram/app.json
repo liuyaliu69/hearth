@@ -1,17 +1,18 @@
 {
   "pages": [
-    "pages/me/index",
+    "pages/home/index",
     "pages/tasks/index",
     "pages/member/index",
     "pages/review/index",
+    "pages/me/index",
     "pages/health/index",
     "pages/login/index"
   ],
   "window": {
-    "navigationBarTitleText": "Hearth",
-    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "火花私域",
+    "navigationBarBackgroundColor": "#F4F5F7",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f7f7f7",
+    "backgroundColor": "#F4F5F7",
     "backgroundTextStyle": "light"
   },
   "style": "v2",
