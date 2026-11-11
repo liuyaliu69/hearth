@@ -1,4 +1,5 @@
 const { request, TOKEN_KEY } = require('./request')
+const { ENV, MOCK_CODE } = require('../config/env')
 
 /**
  * 登录态管理。
@@ -7,7 +8,11 @@ const { request, TOKEN_KEY } = require('./request')
  *   有 token → GET /auth/me 校验
  *       成功 → 直接返回用户
  *       401  → 清 token，走下面的静默登录
- *   无 token → wx.login 拿 code → POST /auth/login → 保存 token
+ *   无 token → 拿 code → POST /auth/login → 保存 token
+ *
+ * 拿 code 的两种方式：
+ *   · 配了 WX_SECRET（真实模式）：wx.login 的真实 code → 微信换真实 openid
+ *   · 没配（mock 模式）：dev 下用固定的 MOCK_CODE，否则每次都是新用户，永远登不进
  *
  * 未开通时后端返回 403 + data.openid，这里原样抛出，
  * 由页面跳到「未开通页」把 openid 展示给老师。
@@ -43,13 +48,22 @@ function wxLogin() {
   })
 }
 
+/** 取本次登录要用的 code */
+async function resolveCode() {
+  // 非生产环境 + 配了固定 code → 用它，保证 openid 稳定
+  if (ENV !== 'prod' && MOCK_CODE) {
+    return MOCK_CODE
+  }
+  return wxLogin()
+}
+
 /** 用 code 换 token */
 async function login() {
-  const code = await wxLogin()
+  const code = await resolveCode()
   const data = await request({
     url: '/api/auth/login',
     method: 'POST',
-    data: { code },
+    data: { code: code },
     skipAuth: true
   })
   setToken(data.token)
