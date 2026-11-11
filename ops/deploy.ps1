@@ -40,6 +40,7 @@ param(
     [switch]$SkipBuild,
     [switch]$DryRun,
     [switch]$Force,
+    [switch]$SkipLocalRestart,
     [string]$Version = '',
     [string]$SshKey = (Join-Path $HOME '.ssh\aliyun_game_ed25519'),
     [string]$Server = 'root@101.200.14.51',
@@ -347,6 +348,30 @@ if ($DryRun) {
 Say ""
 Step '7 报告 / 8 留底' '写发布记录 + 保留 app.jar.prev'
 Write-Report $true '全部步骤成功'
+
+# ---------------------------------------------------------------- 恢复本地开发实例
+# 第 2 步为了解锁 jar 停掉了本地实例；发布成功后要起回来，
+# 否则小程序那边会突然「request:fail」，还以为是代码坏了。
+if ($holders.Count -gt 0 -and -not $SkipLocalRestart -and -not $DryRun) {
+    Say ""
+    Say "  恢复本地开发实例（发布前它在跑）" Cyan
+    try {
+        Start-Process -FilePath 'java' -WindowStyle Hidden -ArgumentList @('-jar', $jar) | Out-Null
+        Start-Sleep -Seconds 3
+        $ok = $false
+        for ($i = 0; $i -lt 20; $i++) {
+            Start-Sleep -Seconds 1
+            try {
+                $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8080/api/health' -UseBasicParsing -TimeoutSec 2
+                if ($r.StatusCode -eq 200) { $ok = $true; break }
+            } catch { }
+        }
+        if ($ok) { Say "  本地实例已恢复（8080 可用）" Green }
+        else { Say "  本地实例启动较慢或失败，需要时手动跑 ops\run-local.ps1" Yellow }
+    } catch {
+        Say "  恢复本地实例失败：$($_.Exception.Message)" Yellow
+    }
+}
 
 Say ""
 Say "==============================================" Green
